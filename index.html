@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Kambing Pedas Gunung Kawi Cab. Jalibar Cab. Jalibar — Manajemen Bahan Baku</title>
+<style>
+  :root {
+    --bg: #ffffff; --bg2: #f5f4f0; --bg3: #eeecea;
+    --txt: #1a1a18; --txt2: #6b6a66; --txt3: #9a9894;
+    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
+    --green: #3B6D11; --green-bg: #EAF3DE; --green-mid: #639922;
+    --amber: #854F0B; --amber-bg: #FAEEDA; --amber-mid: #EF9F27;
+    --red: #A32D2D; --red-bg: #FCEBEB;
+    --radius: 10px; --radius-sm: 7px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  @media(prefers-color-scheme:dark){
+    :root{--bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;--txt:#f0ede8;--txt2:#a09e9a;--txt3:#6b6a66;--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.18);}
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{scrollbar-gutter:stable}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--txt);min-height:100vh;font-size:15px}
+  body.modal-open{overflow:hidden;padding-right:var(--sbw,0px)}
+  
+
+  /* APP */
+  #app-screen{display:block;max-width:480px;margin:0 auto;padding-bottom:80px}
+  .topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:50}.topbar-row{display:flex;align-items:center;gap:12px}.topbar-main{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}.topbar-title{font-size:16px;font-weight:600;line-height:1.2}.topbar-sub{font-size:12px;color:var(--txt2);margin-top:1px}.sync-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;background:var(--bg2);color:var(--txt2);margin-top:6px;align-self:flex-start}.menu-btn{position:relative;width:36px;height:36px;border:1px solid var(--border2);border-radius:10px;background:var(--bg);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:var(--shadow);z-index:55;flex:none;flex-shrink:0}.menu-btn:active{opacity:.8}
+  .menu-list{display:flex;flex-direction:column;gap:8px}
+  .menu-item{width:100%;padding:12px 14px;border:1px solid var(--border2);border-radius:12px;background:var(--bg2);color:var(--txt);text-align:left;font-size:14px;font-weight:600;cursor:pointer}
+  .menu-item small{display:block;font-size:11px;color:var(--txt2);font-weight:500;margin-top:2px}
+  .menu-item:active{opacity:.8}
+  .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green-mid);flex-shrink:0}
+  .sync-dot.spin{background:var(--amber-mid);animation:pulse .8s infinite}
+  .sync-dot.err{background:var(--red)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* SALES FORM TOGGLE */
+  .jual-card{position:relative}
+  .jual-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .jual-title{font-size:16px;font-weight:600;line-height:1.2;transition:all .2s ease;flex:1;min-width:0}
+  .jual-toggle{white-space:nowrap;flex-shrink:0;padding:7px 12px;border-radius:999px;background:var(--bg2);border-color:var(--border);box-shadow:none}
+  .jual-body{display:block}
+  .jual-card.collapsed .jual-head{align-items:center;margin-bottom:0}
+  .jual-card.collapsed .jual-title{font-size:18px;text-align:left;width:auto}
+  .jual-card.collapsed .jual-body{display:none}
+  .jual-card.collapsed .jual-toggle{position:static;margin-left:auto}
+
+  /* BOTTOM NAV */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);display:flex;z-index:50;max-width:480px;margin:0 auto}
+  .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 12px;border:none;background:none;cursor:pointer;color:var(--txt3);font-size:10px;font-weight:500;gap:3px}
+  .nav-btn.on{color:var(--txt)}
+  .nav-icon{font-size:20px;line-height:1}
+
+  /* SECTIONS */
+  .section{display:none;padding:1rem}
+  .section.on{display:block}
+  
+  /* CARDS */
+  .card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:12px}
+  .card-title{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:10px}
+  .stok-toolbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 10px}
+  .stok-sort-label{font-size:11px;color:var(--txt2);font-weight:600;white-space:nowrap}
+  .stok-sort{width:auto;min-width:120px;max-width:180px;padding:7px 10px;font-size:12px;border:1px solid var(--border2);border-radius:999px;background:var(--bg2);color:var(--txt);appearance:none;-webkit-appearance:none;-moz-appearance:none}
+  .stok-sort:focus{outline:none;border-color:var(--green-mid);box-shadow:0 0 0 3px rgba(99,153,34,0.12)}
+  
+  /* METRIC GRID */
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .met{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+  .met-l{font-size:11px;color:var(--txt2);margin-bottom:4px}
+  .met-v{font-size:24px;font-weight:700;color:var(--txt)}
+  .met-v.w{color:var(--amber)}.met-v.d{color:var(--red)}
+
+  /* ALERT */
+  .alert{background:var(--amber-bg);border:1px solid var(--amber-mid);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;color:var(--amber);margin-bottom:8px;line-height:1.4}
+  .alert-acc{background:var(--amber-bg);border:1px solid var(--amber-mid);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden}
+  .alert-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border:none;background:transparent;color:var(--amber);font-size:13px;font-weight:600;cursor:pointer;text-align:left}
+  .alert-head:active{opacity:.8}
+  .alert-count{font-weight:700}
+  .alert-chev{font-size:16px;line-height:1;flex-shrink:0}
+  .alert-body{display:none;padding:0 12px 10px 12px}
+  .alert-acc.on .alert-body{display:block}
+  .alert-item{padding:8px 0;border-top:1px solid rgba(0,0,0,.08);font-size:13px;color:var(--amber);line-height:1.4}
+  @media(prefers-color-scheme:dark){
+    .alert-item{border-top-color:rgba(255,255,255,.08)}
+  }
+
+  /* TABLE */
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .dash-scroll{max-height:210px;overflow-y:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:7px 8px;font-size:11px;font-weight:600;color:var(--txt2);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--bg);z-index:1}
+  td{padding:8px;border-bottom:1px solid var(--border);color:var(--txt);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  
+  /* BADGES */
+  .bx{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+  .bx.ok{background:var(--green-bg);color:var(--green)}
+  .bx.wn{background:var(--amber-bg);color:var(--amber)}
+  .bx.lo{background:var(--red-bg);color:var(--red)}
+
+  /* FORM */
+  .form-group{margin-bottom:10px}
+  .form-label{font-size:12px;font-weight:500;color:var(--txt2);display:block;margin-bottom:4px}
+  .form-input{width:100%;padding:10px 12px;font-size:14px;min-height:44px;line-height:1.2;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--bg);color:var(--txt);-webkit-appearance:none;appearance:none}
+  .form-input:focus{outline:none;border-color:var(--green-mid);box-shadow:0 0 0 3px rgba(99,153,34,0.12)}
+  input.form-input[type="date"]{padding-right:10px;text-align:left}
+  input.form-input[type="date"]::-webkit-datetime-edit{padding:0}
+  input.form-input[type="date"]::-webkit-datetime-edit-fields-wrapper{padding:0}
+  input.form-input[type="date"]::-webkit-datetime-edit-text{padding:0 1px}
+  input.form-input[type="date"]::-webkit-calendar-picker-indicator{opacity:.7;margin:0;cursor:pointer}
+  .form-row{display:grid;gap:8px}
+  .cols2{grid-template-columns:1fr 1fr}
+  .cols3{grid-template-columns:1fr 1fr 1fr}
+
+  /* BUTTONS */
+  .btn{padding:9px 16px;font-size:14px;font-weight:500;border:1px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;background:transparent;color:var(--txt)}
+  .btn:active{opacity:.7}
+  .btn.p{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+  .btn.full{width:100%;padding:12px}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  .btn.danger{color:var(--red);border-color:var(--red-bg)}
+  .btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  .row-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+  .btn.edit{color:var(--green);border-color:var(--green-bg)}
+  .btn.edit:active{opacity:.7}
+
+  /* ROW OPTION MENU */
+  .opt-cell{position:relative;text-align:right;white-space:nowrap}
+  .opt-wrap{position:relative;display:inline-block}
+  .opt-btn{width:34px;height:34px;border:1px solid var(--border2);border-radius:10px;background:var(--bg);color:var(--txt);display:inline-flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:none}
+  .opt-btn:active{opacity:.8}
+  .opt-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);min-width:240px;max-width:min(84vw,320px);background:var(--bg);border:1px solid var(--border2);border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.12);padding:6px;z-index:80;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .opt-menu.on{display:flex;flex-direction:row}
+  .opt-menu .opt-item{flex:1 1 70px;min-width:70px;padding:9px 10px;border:none;border-radius:10px;background:var(--bg2);color:var(--txt);text-align:center;font-size:13px;font-weight:600;cursor:pointer}
+  .opt-menu .opt-item:hover{filter:brightness(.98)}
+  .opt-menu .opt-item.danger{color:var(--red)}
+  .opt-menu .opt-item small{display:block;font-size:11px;color:var(--txt2);font-weight:500;margin-top:2px}
+
+  /* LOG TABS */
+  .tab-switch{display:flex;gap:8px;margin-bottom:10px}
+  .tab-switch .tab-btn{flex:1;border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);border-radius:999px;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer}
+  .tab-switch .tab-btn.on{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+  .log-pane{display:none}
+  .log-pane.on{display:block}
+  .log-filter{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+  .log-filter .filter-btn{border:1px solid var(--border2);background:var(--bg2);color:var(--txt2);border-radius:999px;padding:9px 10px;font-size:12px;font-weight:600;cursor:pointer}
+  .log-filter .filter-btn.on{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+  .log-range{display:none;gap:8px;align-items:stretch;margin-bottom:10px}
+  .log-range.on{display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr) auto;align-items:stretch}
+  .log-range .range-sep{text-align:center;color:var(--txt2);font-size:12px;align-self:center}
+  .log-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+  .log-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px}
+  .log-stat-l{font-size:11px;color:var(--txt2);margin-bottom:4px}
+  .log-stat-v{font-size:15px;font-weight:700;color:var(--txt)}
+  .log-stat-v.accent{color:var(--green)}
+  @media(max-width:520px){
+    .log-range.on{grid-template-columns:1fr}
+    .log-range .range-sep{display:none}
+    .log-range .btn{grid-column:1/-1;width:100%}
+    .log-summary{grid-template-columns:1fr}
+  }
+  @media(max-width:420px){
+    .log-range.on{grid-template-columns:1fr}
+    .log-range .range-sep{display:none}
+    .log-range .btn{grid-column:1/-1;width:100%}
+    .log-summary{grid-template-columns:1fr}
+  }
+
+  /* MODAL */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center}
+  .overlay.on{display:flex}
+
+  /* HAMBURGER DRAWER */
+  .overlay.menu-overlay{display:block;align-items:stretch;justify-content:flex-start;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .28s ease;z-index:230}
+  .overlay.menu-overlay.on{display:block;opacity:1;pointer-events:auto}
+  .menu-sheet{position:absolute;left:0;top:0;height:100%;width:min(84vw,320px);background:var(--bg);border-radius:0 18px 18px 0;padding:1rem 1rem 1.25rem;overflow-y:auto;box-shadow:18px 0 48px rgba(0,0,0,.18);transform:translateX(-102%);transition:transform .34s cubic-bezier(.22,1,.36,1)}
+  .overlay.menu-overlay.on .menu-sheet{transform:translateX(0)}
+  .menu-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1rem}
+  .menu-sheet-title{font-size:16px;font-weight:700}
+  .menu-close{width:34px;height:34px;border:1px solid var(--border2);border-radius:10px;background:var(--bg2);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;box-shadow:none;flex-shrink:0}
+  .menu-close:active{opacity:.8}
+  .sheet{background:var(--bg);border-radius:16px 16px 0 0;padding:1.25rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+  .sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1rem}
+  .sheet-title{font-size:16px;font-weight:600;margin-bottom:1rem}
+  .divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+
+  /* RESEP BAHAN ROW */
+  .rb{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-bottom:10px}
+  .rb > select{width:100%;min-width:0;align-self:end}
+  .rb > div{min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
+  .rb .btn{align-self:end;flex-shrink:0;padding:8px 10px;height:40px}
+  .rb-unit{font-size:11px;color:var(--txt3);font-weight:600;line-height:1.2;margin-bottom:4px;min-height:14px}
+  .rb-unit-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(94px,108px);gap:6px;align-items:end}
+  .rb-unit-row .form-input{width:100%;min-width:0;height:40px}
+  .rb-unit-row select.form-input{padding-right:34px}
+  .form-input.ta{min-height:92px;resize:vertical;line-height:1.45}
+  .recipe-index{margin-top:10px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg)}
+  .recipe-index summary{list-style:none;cursor:pointer;padding:10px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .recipe-index summary::-webkit-details-marker{display:none}
+  .recipe-index summary::after{content:'▾';font-size:12px;color:var(--txt2)}
+  .recipe-index[open] summary::after{content:'▴'}
+  .recipe-index-body{max-height:220px;overflow:auto;border-top:1px solid var(--border);padding:8px}
+  .recipe-index-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .recipe-index-item:last-child{border-bottom:none}
+  .recipe-index-code{font-weight:700;font-size:13px}
+  .recipe-index-name{font-size:12px;color:var(--txt2);margin-top:2px}
+  .recipe-index-actions{display:flex;gap:6px;flex-shrink:0;justify-content:flex-end;flex-wrap:wrap}
+  .backup-list{display:flex;flex-direction:column;gap:8px}
+  .backup-item{border:1px solid var(--border);border-radius:12px;padding:10px;background:var(--bg2)}
+  .backup-item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .backup-item-title{font-size:13px;font-weight:700}
+  .backup-item-meta{font-size:11px;color:var(--txt2);margin-top:3px;line-height:1.4}
+  .backup-item-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+  /* HPP PREVIEW */
+  .hpp-box{background:var(--green-bg);border:1px solid var(--green-mid);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;color:var(--green);margin-bottom:10px;display:none}
+
+  /* RESEP CARD */
+  .resep-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:10px}
+  .resep-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .resep-head-main{min-width:0;flex:1}
+  .resep-name{font-size:15px;font-weight:600;margin-bottom:6px;line-height:1.3}
+  .resep-meta{font-size:11px;color:var(--txt2);margin-top:2px}
+  .resep-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;align-items:center;flex-shrink:0}
+  .resep-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+  .resep-met{background:var(--bg2);border-radius:var(--radius-sm);padding:8px;text-align:center}
+  .resep-met-l{font-size:10px;color:var(--txt2);margin-bottom:2px}
+  .resep-met-v{font-size:14px;font-weight:700}
+
+  /* EMPTY */
+  .empty{text-align:center;color:var(--txt3);font-size:13px;padding:2rem 0}
+
+  /* FAB */
+  .fab{position:fixed;right:16px;bottom:76px;width:52px;height:52px;background:var(--txt);color:var(--bg);border:none;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.25);z-index:60}
+  .fab:active{transform:scale(.95)}
+</style>
+</head>
+<body>
+
+<!-- APP SCREEN -->
+<div id="app-screen">
+  <div class="topbar">
+    <div class="topbar-row">
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+      <div class="topbar-main">
+        <div class="topbar-title">Kambing Pedas Gunung Kawi Cab. Jalibar</div>
+        <div class="topbar-sub" id="tgl-top"></div>
+        <div class="sync-pill"><div class="sync-dot spin" id="sdot"></div><span id="slbl">Memuat...</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENU HAMBURGER -->
+  <div class="overlay menu-overlay" id="menu-overlay">
+    <div class="menu-sheet">
+      <div class="menu-sheet-head">
+        <div class="menu-sheet-title">Menu</div>
+        <button class="menu-close" type="button" onclick="toggleMenu()" aria-label="Tutup menu">✕</button>
+      </div>
+      <div class="menu-list">
+        <button class="menu-item" onclick="openMenuTab('resep')">
+          Resep
+          <small>Kartu resep & komposisi bahan</small>
+        </button>
+        <button class="menu-item" onclick="openMenuTab('owner')">
+          Rekap Penggunaan Owner
+          <small>Catat pemakaian internal via resep</small>
+        </button>
+        <button class="menu-item" onclick="openBackupModal()">
+          Backup & Restore
+          <small>Cadangan otomatis dan pemulihan data</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="section on" id="sec-dash">
+    <div style="height:12px"></div>
+    <div class="metrics" id="mets"></div>
+    <div id="alrt"></div>
+    <div class="card">
+      <div class="card-title">Semua bahan baku</div>
+      <div class="tbl-wrap dash-scroll"><table>
+        <thead><tr><th>Bahan</th><th>Stok</th><th>Sat.</th><th>Status</th></tr></thead>
+        <tbody id="dash-tb"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- STOK -->
+  <div class="section" id="sec-stok">
+    <div style="height:12px"></div>
+    <div class="card">
+      <div class="card-title">Catat Transaksi Stok</div>
+      <div class="form-group">
+        <label class="form-label">Input cepat via teks</label>
+        <textarea class="form-input ta" id="tbulk" rows="6" placeholder="masuk&#10;B-DK,500,stok awal&#10;B-JK,200,belanja pasar" spellcheck="false" autocapitalize="characters"></textarea>
+      </div>
+      <div style="font-size:12px;color:var(--txt2);margin-top:-2px;margin-bottom:10px;line-height:1.5">Baris pertama wajib <strong>masuk</strong>. Baris berikutnya: <strong>kode bahan, jumlah, catatan</strong>. Kode wajib diawali <strong>B-</strong>. Jumlah wajib dalam satuan bawah: gram, ml, atau pcs.</div>
+      <div class="divider"></div>
+      <div class="form-group">
+        <label class="form-label">Atau input lewat form</label>
+      </div>
+      <div class="form-row cols2" style="margin-bottom:8px">
+        <div class="form-group">
+          <label class="form-label">Bahan</label>
+          <select class="form-input" id="tb" onchange="updateStokUnit()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jenis</label>
+          <select class="form-input" id="tj"><option value="masuk">Masuk (beli)</option></select>
+        </div>
+      </div>
+      <div class="form-row cols2" style="margin-bottom:8px">
+        <div class="form-group"><label class="form-label">Jumlah <span id="tq-unit" style="font-size:11px;color:var(--txt3);font-weight:600;margin-left:6px">(Satuan: -)</span></label><input type="number" class="form-input" id="tq" placeholder="0" min="0" step="0.1"></div>
+        <div class="form-group"><label class="form-label">Catatan</label><input type="text" class="form-input" id="tn" placeholder="opsional"></div>
+      </div>
+      <button class="btn p full" onclick="saveTrx()">Simpan Transaksi</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Daftar Bahan Baku</div>
+      <div class="stok-toolbar">
+        <span class="stok-sort-label">Sort</span>
+        <select class="stok-sort" id="stok-sort" onchange="setStokSort(this.value)">
+          <option value="status">Status</option>
+          <option value="stok">Stok terendah</option>
+          <option value="nama">Nama (A–Z)</option>
+        </select>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Bahan</th><th>Stok</th><th>Min</th><th>Status</th><th style="text-align:right"></th></tr></thead>
+        <tbody id="stok-tb"></tbody>
+      </table></div>
+    </div>
+    <div style="height:60px"></div>
+  </div>
+
+  <!-- PENJUALAN -->
+  <div class="section" id="sec-jual">
+    <div style="height:12px"></div>
+    <div class="card jual-card" id="jual-card">
+      <div class="jual-head">
+        <div class="jual-title" id="jual-title">Rekap Penjualan</div>
+        <button class="btn sm jual-toggle" id="jual-toggle" onclick="toggleJualForm()">Sembunyikan</button>
+      </div>
+      <div class="jual-body" id="jual-body">
+        <div class="form-group">
+          <label class="form-label">Tanggal transaksi</label>
+          <input type="date" class="form-input" id="pj-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Format input</label>
+          <textarea class="form-input ta" id="pj" rows="4" placeholder="KP,2,60\nKP,3,90" spellcheck="false" autocapitalize="characters"></textarea>
+        </div>
+        <div style="font-size:12px;color:var(--txt2);margin-top:-2px;margin-bottom:10px">Satu baris = satu transaksi. Format: kode resep, jumlah, total (angka ribu). Contoh: KP,2,60</div>
+        <button class="btn p full" onclick="saveJual()">Simpan Rekap</button>
+      </div>
+    </div>
+    <div style="height:60px"></div>
+  </div>
+
+  <!-- OWNER -->
+  <div class="section" id="sec-owner">
+    <div style="height:12px"></div>
+    <div class="card">
+      <div class="card-title">Rekap Penggunaan Owner</div>
+      <div class="form-group">
+        <label class="form-label">Tanggal transaksi</label>
+        <input type="date" class="form-input" id="owner-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Format input</label>
+        <textarea class="form-input ta" id="owner" rows="4" placeholder="KP,1\nKP,2" spellcheck="false" autocapitalize="characters"></textarea>
+      </div>
+      <div style="font-size:12px;color:var(--txt2);margin-top:-2px;margin-bottom:10px">Satu baris = satu penggunaan. Format: kode resep, jumlah porsi. Contoh: KP,1</div>
+      <button class="btn p full" onclick="saveOwnerUsage()">Simpan Rekap Owner</button>
+    </div>
+    <div style="height:60px"></div>
+  </div>
+
+  <!-- FINANCE -->
+  <div class="section" id="sec-finance">
+    <div style="height:12px"></div>
+    <div class="card">
+      <div class="card-title">Finance</div>
+      <div class="log-summary" id="finance-metrics"></div>
+      <div class="tbl-wrap" style="margin-top:10px"><table>
+        <thead><tr><th>Waktu</th><th>Kode</th><th>Menu</th><th>Qty</th><th>Total</th></tr></thead>
+        <tbody id="finance-tb"></tbody>
+      </table></div>
+    </div>
+    <div style="height:60px"></div>
+  </div>
+
+  <!-- RESEP -->
+  <div class="section" id="sec-resep">
+    <div style="height:12px"></div>
+    <div id="rlist"></div>
+    <div style="height:60px"></div>
+  </div>
+
+  <!-- LOG -->
+  <div class="section" id="sec-log">
+    <div style="height:12px"></div>
+    <div class="card">
+      <div class="card-title">Riwayat</div>
+      <div class="tab-switch">
+        <button class="tab-btn on" id="tab-jual" onclick="setLogTab('jual')">Rekap Penjualan</button>
+        <button class="tab-btn" id="tab-stoklog" onclick="setLogTab('stok')">Catatan Stok</button>
+        <button class="tab-btn" id="tab-stokopname" onclick="setLogTab('opname')">Stok Opname</button>
+      </div>
+      <div class="log-range" id="log-range-box">
+        <input type="date" class="form-input" id="log-from">
+        <span class="range-sep">s/d</span>
+        <input type="date" class="form-input" id="log-to">
+        <button class="btn p" onclick="applyLogFilter()">Terapkan</button>
+      </div>
+      <div class="log-filter">
+        <button class="filter-btn on" id="filter-today" onclick="setLogFilter('today')">Hari ini</button>
+        <button class="filter-btn" id="filter-week" onclick="setLogFilter('week')">Minggu ini</button>
+        <button class="filter-btn" id="filter-range" onclick="setLogFilter('range')">Rentang</button>
+      </div>
+      <div class="log-pane on" id="log-pane-jual">
+        <div class="log-summary">
+          <div class="log-stat">
+            <div class="log-stat-l">Omset</div>
+            <div class="log-stat-v accent" id="jual-omset">Rp 0</div>
+          </div>
+          <div class="log-stat">
+            <div class="log-stat-l">Transaksi</div>
+            <div class="log-stat-v" id="jual-count">0</div>
+          </div>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Waktu</th><th>Kode</th><th>Menu</th><th>Qty</th><th>Total</th></tr></thead>
+          <tbody id="jual-tb"></tbody>
+        </table></div>
+      </div>
+      <div class="log-pane" id="log-pane-stok">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Waktu</th><th>Bahan</th><th>Jenis</th><th>Qty</th><th>Catatan</th></tr></thead>
+          <tbody id="stoklog-tb"></tbody>
+        </table></div>
+      </div>
+      <div class="log-pane" id="log-pane-opname">
+        <div class="log-summary">
+          <div class="log-stat">
+            <div class="log-stat-l">Catatan</div>
+            <div class="log-stat-v accent" id="opname-count">0</div>
+          </div>
+          <div class="log-stat">
+            <div class="log-stat-l">Tambah</div>
+            <div class="log-stat-v" id="opname-plus">0</div>
+          </div>
+          <div class="log-stat">
+            <div class="log-stat-l">Kurang</div>
+            <div class="log-stat-v" id="opname-minus">0</div>
+          </div>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Waktu</th><th>Bahan</th><th>Stok Awal</th><th>Stok Akhir</th><th>Selisih</th><th>Catatan</th></tr></thead>
+          <tbody id="opname-tb"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn on" onclick="goTab('dash',this)" id="nav-dash">
+      <span class="nav-icon">📊</span><span>Dashboard</span>
+    </button>
+    <button class="nav-btn" onclick="goTab('stok',this)" id="nav-stok">
+      <span class="nav-icon">📦</span><span>Stok</span>
+    </button>
+    <button class="nav-btn" onclick="goTab('jual',this)" id="nav-jual">
+      <span class="nav-icon">💰</span><span>Penjualan</span>
+    </button>
+    <button class="nav-btn" onclick="goTab('finance',this)" id="nav-finance">
+      <span class="nav-icon">💳</span><span>Finance</span>
+    </button>
+    <button class="nav-btn" onclick="goTab('log',this)" id="nav-log">
+      <span class="nav-icon">🕐</span><span>Riwayat</span>
+    </button>
+  </nav>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="onFab()">+</button>
+</div>
+
+<!-- MODAL TAMBAH BAHAN -->
+<div class="overlay" id="modal-bahan">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="bahan-modal-title">Tambah Bahan Baku</div>
+    <input type="hidden" id="bid">
+    <div class="form-row cols2"><div class="form-group"><label class="form-label">Kode Bahan</label><input class="form-input" id="bk" placeholder="B-DK" spellcheck="false" autocapitalize="characters"></div><div class="form-group"><label class="form-label">Nama Bahan</label><input class="form-input" id="bn" placeholder="mis: Daging Kambing"></div></div>
+    <div class="form-row cols2"><div class="form-group"><label class="form-label">Satuan</label><select class="form-input" id="bs"><option>kg</option><option>gram</option><option>liter</option><option>ml</option><option>pcs</option><option>kodi</option></select></div><div class="form-group"><label class="form-label">Harga/Satuan (Rp)</label><input type="number" class="form-input" id="bh" placeholder="0"></div></div>
+    <div class="form-row cols2"><div class="form-group"><label class="form-label">Stok Awal</label><input type="number" class="form-input" id="bst" placeholder="0"></div><div class="form-group"><label class="form-label">Min. Stok (batas alert)</label><input type="number" class="form-input" id="bm" placeholder="0"></div></div>
+    <div class="btn-row"><button class="btn" onclick="closeBahanModal()">Batal</button><button class="btn p" id="bahan-save-btn" onclick="saveBahan()">Simpan</button></div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH RESEP -->
+<div class="overlay" id="modal-resep">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="resep-modal-title">Tambah Kartu Resep</div>
+    <div class="form-row cols3"><div class="form-group"><label class="form-label">Kode Resep</label><input class="form-input" id="rk" placeholder="KP" spellcheck="false" autocapitalize="characters"></div><div class="form-group"><label class="form-label">Nama Menu</label><input class="form-input" id="rn" placeholder="mis: Kambing Pedas"></div><div class="form-group"><label class="form-label">Harga Jual (Rp)</label><input type="number" class="form-input" id="rj" placeholder="0" oninput="prevHPP()"></div></div>
+    <details class="recipe-index">
+      <summary>Daftar kode resep</summary>
+      <div class="recipe-index-body" id="recipe-index"></div>
+    </details>
+    <div class="divider"></div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px">Bahan & Gramasi per Porsi</div>
+    <div id="rblist"></div>
+    <button class="btn full" onclick="addRB()" style="margin-bottom:10px">+ Tambah Bahan</button>
+    <div class="hpp-box" id="hpre"></div>
+    <div class="btn-row"><button class="btn" onclick="closeResepModal()">Batal</button><button class="btn p" id="resep-save-btn" onclick="saveResep()">Simpan Resep</button></div>
+  </div>
+</div>
+
+
+<!-- MODAL ALASAN OPNAME -->
+<div class="overlay" id="modal-opname-reason">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Alasan Stok Opname</div>
+    <div class="card" style="margin-bottom:12px">
+      <div id="opname-info" style="font-size:14px;line-height:1.6"></div>
+      <div id="opname-delta" style="margin-top:10px;font-size:13px;font-weight:600"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Alasan selisih</label>
+      <textarea class="form-input ta" id="opname-reason" rows="4" placeholder="Tuliskan alasan kekurangan / kelebihan stok"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn" type="button" onclick="cancelOpnameReason()">Batal</button>
+      <button class="btn p" type="button" onclick="saveOpnameReason()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CATATAN -->
+<div class="overlay" id="modal-catatan">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Catatan Transaksi</div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title" id="catatan-meta"></div>
+      <div id="catatan-text" style="font-size:14px;line-height:1.6;white-space:pre-wrap"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn p" onclick="cm('modal-catatan')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BACKUP -->
+<div class="overlay" id="modal-backup">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Backup & Restore</div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Status</div>
+      <div id="backup-status" style="font-size:13px;line-height:1.65"></div>
+    </div>
+    <div class="btn-row" style="justify-content:flex-start;flex-wrap:wrap">
+      <button class="btn p" type="button" onclick="makeBackupNow()">Backup Sekarang</button>
+      <button class="btn" type="button" onclick="exportLatestBackup()">Download JSON</button>
+      <button class="btn" type="button" onclick="document.getElementById('backup-file').click()">Restore File</button>
+      <button class="btn danger" type="button" onclick="clearBackupHistory()">Hapus Backup Lokal</button>
+      <input type="file" id="backup-file" accept="application/json" style="display:none" onchange="importBackupFile(this.files && this.files[0])">
+    </div>
+    <div class="divider"></div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Backup Lokal Terakhir</div>
+      <div class="backup-list" id="backup-list"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn p" type="button" onclick="cm('modal-backup')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VIEW BAHAN -->
+<div class="overlay" id="modal-bahan-view">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Detail Bahan Baku</div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title" id="bahan-view-name"></div>
+      <div id="bahan-view-body" style="font-size:14px;line-height:1.7;white-space:pre-wrap"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn p" onclick="cm('modal-bahan-view')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── LOCAL STORAGE DATABASE ───────────────────────────────
+const DB_KEY = 'kpgk_db_v1';
+const __memStorage = {};
+function safeGetItem(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    return Object.prototype.hasOwnProperty.call(__memStorage, key) ? __memStorage[key] : null;
+  }
+}
+
+function safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, String(value));
+  } catch (e) {
+    __memStorage[key] = String(value);
+  }
+}
+
+const BACKUP_KEY = 'kpgk_backup_history_v1';
+const BACKUP_MAX = 30;
+let backupReady = false;
+
+function safeParseJSON(raw, fallback) {
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function getBackupHistory() {
+  const raw = safeGetItem(BACKUP_KEY);
+  const parsed = safeParseJSON(raw || '[]', []);
+  return Array.isArray(parsed) ? parsed : [];
+}
+
+function setBackupHistory(list) {
+  const clean = Array.isArray(list) ? list.slice(0, BACKUP_MAX) : [];
+  safeSetItem(BACKUP_KEY, JSON.stringify(clean));
+}
+
+function cloneDBPayload() {
+  return JSON.parse(JSON.stringify(db));
+}
+
+function backupSig(payload) {
+  try {
+    return JSON.stringify(payload);
+  } catch (e) {
+    return '';
+  }
+}
+
+function addBackupSnapshot(reason = 'auto', forcedPayload = null) {
+  if (!backupReady) return false;
+  const payload = forcedPayload || cloneDBPayload();
+  const sig = backupSig(payload);
+  if (!sig) return false;
+
+  const history = getBackupHistory();
+  if (history.length && history[0]?.sig === sig) return false;
+
+  const ts = Date.now();
+  history.unshift({
+    id: 'bk' + ts + Math.random().toString(36).slice(2, 6),
+    ts,
+    w: new Date(ts).toLocaleString('id-ID'),
+    reason,
+    sig,
+    data: payload,
+    stats: {
+      bahan: Array.isArray(payload.bahan) ? payload.bahan.length : 0,
+      resep: Array.isArray(payload.resep) ? payload.resep.length : 0,
+      transaksi: Array.isArray(payload.transaksi) ? payload.transaksi.length : 0,
+      opname: Array.isArray(payload.opname) ? payload.opname.length : 0
+    }
+  });
+  setBackupHistory(history);
+  return true;
+}
+
+function formatBackupInfo(entry) {
+  if (!entry) return 'Belum ada backup.';
+  const st = entry.stats || {};
+  return `${entry.w} · ${entry.reason || 'auto'} · ${st.bahan || 0} bahan, ${st.resep || 0} resep, ${st.transaksi || 0} transaksi, ${st.opname || 0} opname`;
+}
+
+function refreshBackupUI() {
+  const statusEl = document.getElementById('backup-status');
+  const listEl = document.getElementById('backup-list');
+  if (!statusEl && !listEl) return;
+
+  const history = getBackupHistory();
+  const latest = history[0];
+  if (statusEl) {
+    statusEl.innerHTML = history.length
+      ? `<div><strong>Total backup:</strong> ${history.length}</div><div><strong>Terakhir:</strong> ${formatBackupInfo(latest)}</div><div style="color:var(--txt2);margin-top:4px">Backup otomatis aktif selama app dibuka.</div>`
+      : '<div>Belum ada backup lokal.</div><div style="color:var(--txt2);margin-top:4px">Backup akan dibuat otomatis setelah ada perubahan data.</div>';
+  }
+
+  if (listEl) {
+    listEl.innerHTML = history.length ? history.map(entry => `
+      <div class="backup-item">
+        <div class="backup-item-head">
+          <div style="min-width:0">
+            <div class="backup-item-title">${entry.w || '-'}</div>
+            <div class="backup-item-meta">${formatBackupInfo(entry)}</div>
+          </div>
+          <div class="bx ${entry.reason === 'manual' ? 'ok' : 'wn'}">${entry.reason || 'auto'}</div>
+        </div>
+        <div class="backup-item-actions">
+          <button class="btn sm edit" type="button" onclick="restoreBackupById('${entry.id}')">Pulihkan</button>
+          <button class="btn sm" type="button" onclick="downloadBackupById('${entry.id}')">Unduh</button>
+        </div>
+      </div>
+    `).join('') : '<div class="empty" style="padding:14px 0">Belum ada backup</div>';
+  }
+}
+
+function openBackupModal() {
+  cm('menu-overlay');
+  refreshBackupUI();
+  om('modal-backup');
+}
+
+function downloadBlob(filename, content, mime = 'application/json') {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    a.remove();
+  }, 0);
+}
+
+function exportLatestBackup() {
+  const history = getBackupHistory();
+  const entry = history[0] || {
+    id: 'bk-current',
+    ts: Date.now(),
+    w: new Date().toLocaleString('id-ID'),
+    reason: 'manual',
+    data: cloneDBPayload(),
+    stats: {
+      bahan: db.bahan.length,
+      resep: db.resep.length,
+      transaksi: db.transaksi.length,
+      opname: db.opname.length
+    }
+  };
+  const filename = `kpgk-backup-${new Date(entry.ts).toISOString().replace(/[:.]/g, '-')}.json`;
+  downloadBlob(filename, JSON.stringify(entry, null, 2));
+  ss('ok', 'Backup JSON diunduh');
+}
+
+function makeBackupNow() {
+  addBackupSnapshot('manual');
+  refreshBackupUI();
+  ss('ok', 'Backup lokal dibuat');
+}
+
+function restoreDbPayload(payload) {
+  if (!payload || typeof payload !== 'object') return false;
+  const bahan = Array.isArray(payload.bahan) ? payload.bahan : [];
+  const resep = Array.isArray(payload.resep) ? payload.resep : [];
+  const transaksi = Array.isArray(payload.transaksi) ? payload.transaksi : [];
+  const opname = Array.isArray(payload.opname) ? payload.opname : [];
+  db = { bahan, resep, transaksi, opname };
+  return true;
+}
+
+function restoreBackupById(id) {
+  const history = getBackupHistory();
+  const entry = history.find(x => x.id === id);
+  if (!entry) {
+    alert('Backup tidak ditemukan');
+    return;
+  }
+  if (!confirm('Pulihkan backup ini? Data saat ini akan diganti.')) return;
+  if (!restoreDbPayload(entry.data)) {
+    alert('Isi backup tidak valid');
+    return;
+  }
+  saveDB();
+  render();
+  refreshBackupUI();
+  ss('ok', 'Backup dipulihkan');
+}
+
+function downloadBackupById(id) {
+  const history = getBackupHistory();
+  const entry = history.find(x => x.id === id);
+  if (!entry) {
+    alert('Backup tidak ditemukan');
+    return;
+  }
+  const filename = `kpgk-backup-${new Date(entry.ts).toISOString().replace(/[:.]/g, '-')}.json`;
+  downloadBlob(filename, JSON.stringify(entry, null, 2));
+}
+
+function clearBackupHistory() {
+  if (!confirm('Hapus semua backup lokal?')) return;
+  safeSetItem(BACKUP_KEY, '[]');
+  refreshBackupUI();
+  ss('ok', 'Backup lokal dihapus');
+}
+
+async function importBackupFile(file) {
+  const input = document.getElementById('backup-file');
+  if (input) input.value = '';
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    const payload = parsed?.data && typeof parsed.data === 'object' ? parsed.data : parsed;
+    if (!restoreDbPayload(payload)) {
+      alert('Format backup tidak valid');
+      return;
+    }
+    saveDB();
+    render();
+    refreshBackupUI();
+    ss('ok', 'Backup file dipulihkan');
+  } catch (e) {
+    alert('Gagal membaca file backup');
+  }
+}
+
+const DEFAULT_DB = {
+  bahan: [
+    { id: 'b-daging', kode: 'B-DK', nama: 'Daging Kambing', satuan: 'kg', harga: 150000, stok: 100, min: 10 },
+    { id: 'b-jeroan', kode: 'B-JK', nama: 'Jeroan Kambing', satuan: 'kg', harga: 50000, stok: 100, min: 10 },
+    { id: 'b-tulang', kode: 'B-TK', nama: 'Tulang Kambing', satuan: 'kg', harga: 0, stok: 100, min: 10 }
+  ],
+  resep: [
+    {
+      id: 'r-kambing-pedas',
+      kode: 'KP',
+      nama: 'Kambing Pedas',
+      hj: 30000,
+      bahan: [
+        { id: 'b-daging', qty: 0.005 },
+        { id: 'b-tulang', qty: 0.004 }
+      ]
+    }
+  ],
+  transaksi: [],
+  opname: []
+};
+
+let db = { bahan: [], resep: [], transaksi: [], opname: [] };
+let currentTab = 'dash';
+let logTab = 'jual';
+let logFilterMode = 'today';
+let logRangeFrom = '';
+let logRangeTo = '';
+let stokSortMode = 'status';
+const UNIT_GROUPS = {
+  weight: ['kg', 'gram'],
+  volume: ['liter', 'ml'],
+  count: ['pcs', 'kodi']
+};
+const UNIT_TO_BASE = {
+  kg: 1000,
+  gram: 1,
+  liter: 1000,
+  ml: 1,
+  pcs: 1,
+  kodi: 20
+};
+
+function normalizeUnit(u) {
+  return String(u || '').trim().toLowerCase();
+}
+
+function unitFamily(u) {
+  const unit = normalizeUnit(u);
+  return Object.keys(UNIT_GROUPS).find(k => UNIT_GROUPS[k].includes(unit)) || '';
+}
+
+function unitOptionsFor(u) {
+  const unit = normalizeUnit(u);
+  const family = unitFamily(unit);
+  if (!family) return unit ? [unit] : [];
+  const familyUnits = UNIT_GROUPS[family];
+  return [unit, ...familyUnits.filter(x => x !== unit)];
+}
+
+function convertUnitQty(qty, fromUnit, toUnit) {
+  const n = parseFloat(qty);
+  if (!Number.isFinite(n)) return 0;
+  const from = normalizeUnit(fromUnit);
+  const to = normalizeUnit(toUnit);
+  if (!from || !to || from === to) return n;
+  const famA = unitFamily(from);
+  const famB = unitFamily(to);
+  if (!famA || famA !== famB) return n;
+  const fromFactor = UNIT_TO_BASE[from] || 1;
+  const toFactor = UNIT_TO_BASE[to] || 1;
+  return n * (fromFactor / toFactor);
+}
+
+function unitShort(u) {
+  return normalizeUnit(u) || '-';
+}
+
+function formatSmartNumber(n) {
+  const num = Number(n) || 0;
+  const fixed = Math.round(num * 1000) / 1000;
+  return new Intl.NumberFormat('id-ID', {
+    maximumFractionDigits: 3
+  }).format(fixed);
+}
+
+function displayQty(qty, unit) {
+  const n = parseFloat(qty) || 0;
+  const u = normalizeUnit(unit);
+  let shownQty = n;
+  let shownUnit = unitShort(u);
+
+  if (u === 'kg') {
+    shownQty = n * 1000;
+    shownUnit = 'gram';
+  } else if (u === 'liter') {
+    shownQty = n * 1000;
+    shownUnit = 'ml';
+  } else if (u === 'kodi') {
+    shownQty = n * 20;
+    shownUnit = 'pcs';
+  }
+
+  return `${formatSmartNumber(shownQty)} ${shownUnit}`;
+}
+
+function sanitizeBahanCode(code) {
+  let c = String(code || '').trim().toUpperCase().replace(/\s+/g, '');
+  c = c.replace(/[^A-Z0-9-]/g, '');
+  if (!c) return '';
+  if (c.startsWith('B-')) return 'B-' + c.slice(2).replace(/^-+/, '');
+  if (c.startsWith('B')) {
+    const rest = c.slice(1).replace(/^-+/, '');
+    return rest ? `B-${rest}` : 'B-';
+  }
+  return `B-${c.replace(/^-+/, '')}`;
+}
+
+function autoBahanCode(nama) {
+  const initials = String(nama || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+  return `B-${initials || 'BHN'}`;
+}
+
+function bahanKode(b) {
+  return sanitizeBahanCode(b?.kode) || autoBahanCode(b?.nama);
+}
+
+function bahanLowerUnit(unit) {
+  const u = normalizeUnit(unit);
+  if (u === 'kg') return 'gram';
+  if (u === 'liter') return 'ml';
+  if (u === 'kodi') return 'pcs';
+  return u || '';
+}
+
+function ensureBahanCodes() {
+  const used = new Set();
+  let changed = false;
+  db.bahan = db.bahan.map((b, idx) => {
+    const copy = { ...b };
+    let code = sanitizeBahanCode(copy.kode) || autoBahanCode(copy.nama || copy.id || `Bahan ${idx + 1}`);
+    let base = code;
+    let n = 2;
+    while (used.has(code)) {
+      code = `${base}-${n++}`;
+    }
+    if (copy.kode !== code) changed = true;
+    copy.kode = code;
+    used.add(code);
+    return copy;
+  });
+  return changed;
+}
+
+let alertExpanded = false;
+let jualFormCollapsed = true;
+let bahanEditId = '';
+let recipeEditId = '';
+// ─── STORAGE HELPERS ──────────────────────────────────────
+function loadDB() {
+  try {
+    const raw = safeGetItem(DB_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      db.bahan = Array.isArray(parsed.bahan) ? parsed.bahan : [];
+      db.resep = Array.isArray(parsed.resep) ? parsed.resep : [];
+      db.transaksi = Array.isArray(parsed.transaksi) ? parsed.transaksi : [];
+      db.opname = Array.isArray(parsed.opname) ? parsed.opname : [];
+      db.transaksi = db.transaksi.map(t => {
+        if (Number.isFinite(Number(t?.ts)) && Number(t.ts) > 0) return t;
+        const d = parseIdLocaleDate(t?.w);
+        return d ? { ...t, ts: d.getTime() } : t;
+      });
+    }
+  } catch (e) {
+    console.warn('Gagal load DB:', e);
+  }
+
+  if (!db.bahan.length && !db.resep.length && !db.transaksi.length) {
+    db = JSON.parse(JSON.stringify(DEFAULT_DB));
+    saveDB();
+  }
+
+  if (ensureBahanCodes()) saveDB();
+}
+
+function saveDB() {
+  safeSetItem(DB_KEY, JSON.stringify(db));
+  if (backupReady) addBackupSnapshot('auto');
+}
+
+function seedTestSaleOnce() {
+  const seedKey = 'kpgk_seed_test_sale_2026_04_28_kp_1_30';
+  if (safeGetItem(seedKey)) return;
+
+  const seedTs = new Date(2026, 3, 28, 12, 0, 0, 0).getTime();
+  const seedExists = db.transaksi.some(t => {
+    const kode = safeKode(t?.kode || (String(t?.b || '').match(/\(([^)]+)\)$/)?.[1] || ''));
+    return kode === 'KP' && Number(t?.ts) === seedTs;
+  });
+
+  if (!seedExists) {
+    db.transaksi.unshift({
+      id: 't-seed-kp-20260428',
+      w: '28/04/2026, 12.00.00',
+      ts: seedTs,
+      b: 'Kambing Pedas (KP)',
+      s: 'porsi',
+      j: 'jual',
+      q: 1,
+      total: 30000,
+      kode: 'KP',
+      n: 'kp,1,30'
+    });
+    saveDB();
+  }
+
+  safeSetItem(seedKey, '1');
+}
+
+function pad2(n) {
+  return String(n).padStart(2, '0');
+}
+
+function toInputDate(d) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+function startOfDay(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+}
+
+function endOfDay(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+}
+
+function startOfWeek(d) {
+  const day = (d.getDay() + 6) % 7; // Senin = 0
+  const s = new Date(d);
+  s.setDate(d.getDate() - day);
+  s.setHours(0, 0, 0, 0);
+  return s;
+}
+
+function parseIdLocaleDate(str) {
+  const s = String(str || '').trim();
+  const m = s.match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})(?:,?\s+)?(\d{1,2})[.:](\d{1,2})(?:[.:](\d{1,2}))?/);
+  if (m) {
+    let [, dd, mm, yy, hh, mi, ss] = m;
+    let y = parseInt(yy, 10);
+    if (y < 100) y += 2000;
+    return new Date(y, parseInt(mm, 10) - 1, parseInt(dd, 10), parseInt(hh, 10), parseInt(mi, 10), parseInt(ss || '0', 10), 0);
+  }
+  const ts = Date.parse(s);
+  return Number.isNaN(ts) ? null : new Date(ts);
+}
+
+function getTransaksiTs(t) {
+  const ts = Number(t?.ts);
+  if (Number.isFinite(ts) && ts > 0) return ts;
+  const d = parseIdLocaleDate(t?.w);
+  return d ? d.getTime() : 0;
+}
+
+function refreshLogFilterUI() {
+  const btnToday = document.getElementById('filter-today');
+  const btnWeek = document.getElementById('filter-week');
+  const btnRange = document.getElementById('filter-range');
+  const box = document.getElementById('log-range-box');
+  if (btnToday) btnToday.classList.toggle('on', logFilterMode === 'today');
+  if (btnWeek) btnWeek.classList.toggle('on', logFilterMode === 'week');
+  if (btnRange) btnRange.classList.toggle('on', logFilterMode === 'range');
+  if (box) box.classList.toggle('on', logFilterMode === 'range');
+  const fromEl = document.getElementById('log-from');
+  const toEl = document.getElementById('log-to');
+  if (fromEl && !fromEl.value && logRangeFrom) fromEl.value = logRangeFrom;
+  if (toEl && !toEl.value && logRangeTo) toEl.value = logRangeTo;
+}
+
+function setLogFilter(mode) {
+  logFilterMode = mode === 'week' ? 'week' : mode === 'range' ? 'range' : 'today';
+  const today = toInputDate(new Date());
+  if (logFilterMode === 'range') {
+    if (!logRangeFrom) logRangeFrom = today;
+    if (!logRangeTo) logRangeTo = today;
+    const fromEl = document.getElementById('log-from');
+    const toEl = document.getElementById('log-to');
+    if (fromEl) fromEl.value = logRangeFrom;
+    if (toEl) toEl.value = logRangeTo;
+  }
+  render();
+}
+
+function applyLogFilter() {
+  const fromEl = document.getElementById('log-from');
+  const toEl = document.getElementById('log-to');
+  if (fromEl) logRangeFrom = fromEl.value;
+  if (toEl) logRangeTo = toEl.value;
+  if (logFilterMode === 'range' && (!logRangeFrom || !logRangeTo)) {
+    alert('Isi tanggal awal dan akhir');
+    return;
+  }
+  render();
+}
+
+function getLogRangeBounds() {
+  const now = new Date();
+  if (logFilterMode === 'today') {
+    return { from: startOfDay(now), to: endOfDay(now) };
+  }
+  if (logFilterMode === 'week') {
+    return { from: startOfWeek(now), to: endOfDay(now) };
+  }
+  if (logFilterMode === 'range') {
+    if (!logRangeFrom || !logRangeTo) return { from: null, to: null };
+    const from = new Date(`${logRangeFrom}T00:00:00`);
+    const to = new Date(`${logRangeTo}T23:59:59.999`);
+    if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) return { from: null, to: null };
+    return { from, to };
+  }
+  return { from: null, to: null };
+}
+
+function filterByLogDate(rows) {
+  const bounds = getLogRangeBounds();
+  if (!bounds.from || !bounds.to) return rows;
+  const fromTs = bounds.from.getTime();
+  const toTs = bounds.to.getTime();
+  return rows.filter(t => {
+    const ts = getTransaksiTs(t);
+    return ts >= fromTs && ts <= toTs;
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+function startApp() {
+  showApp();
+}
+
+function showApp() {
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('tgl-top').textContent = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const pjDateEl = document.getElementById('pj-date');
+  if (pjDateEl && !pjDateEl.value) pjDateEl.value = toInputDate(new Date());
+  const ownerDateEl = document.getElementById('owner-date');
+  if (ownerDateEl && !ownerDateEl.value) ownerDateEl.value = toInputDate(new Date());
+  ss('ok', 'Offline · tersimpan di browser');
+  const sortSel = document.getElementById('stok-sort');
+  if (sortSel) sortSel.value = stokSortMode;
+  render();
+  syncJualFormUI();
+}
+
+window.onload = () => {
+  try {
+    loadDB();
+    seedTestSaleOnce();
+    backupReady = true;
+  } catch (e) {
+    console.error('Init DB error:', e);
+  }
+  try {
+    showApp();
+    refreshBackupUI();
+  } catch (e) {
+    console.error('Show app error:', e);
+    const lbl = document.getElementById('slbl');
+    if (lbl) lbl.textContent = 'Siap';
+  }
+};
+
+// ─── STATUS ───────────────────────────────────────────────
+function ss(state, msg) {
+  const d = document.getElementById('sdot');
+  const l = document.getElementById('slbl');
+  if (d) {
+    d.className = 'sync-dot' + (state === 'spin' ? ' spin' : state === 'err' ? ' err' : '');
+  }
+  if (l) l.textContent = msg;
+}
+
+// ─── SIMPLE MODAL HELPERS ─────────────────────────────────
+function syncScrollLock() {
+  const anyOpen = document.querySelectorAll('.overlay.on').length > 0;
+  const sbw = window.innerWidth - document.documentElement.clientWidth;
+  document.body.classList.toggle('modal-open', anyOpen);
+  document.body.style.setProperty('--sbw', anyOpen && sbw > 0 ? sbw + 'px' : '0px');
+}
+function om(id) { document.getElementById(id).classList.add('on'); syncScrollLock(); }
+function cm(id) { document.getElementById(id).classList.remove('on'); syncScrollLock(); }
+
+// ─── RENDER HELPERS ───────────────────────────────────────
+function sbadge(s, m) {
+  if (s <= 0) return '<span class="bx lo">Habis</span>';
+  if (m > 0 && s <= m) return '<span class="bx wn">Hampir habis</span>';
+  return '<span class="bx ok">Aman</span>';
+}
+function rp(n) { return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID'); }
+function safeKode(v) { return String(v || '').trim().toUpperCase().replace(/\s+/g, ''); }
+function autoKode(nama) {
+  return String(nama || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => w[0])
+    .join('')
+    .toUpperCase();
+}
+function recipeKode(r) {
+  return safeKode(r.kode) || autoKode(r.nama) || '-';
+}
+function saleMenuTitle(t) {
+  return String(t?.b || '').replace(/\s*\([^)]+\)\s*$/, '') || String(t?.b || '') || '-';
+}
+function saleKodeValue(t) {
+  const fromKode = safeKode(t?.kode);
+  if (fromKode) return fromKode;
+  const m = String(t?.b || '').match(/\(([^)]+)\)\s*$/);
+  return safeKode(m?.[1] || '') || '-';
+}
+function trxLabel(j) {
+  if (j === 'masuk') return 'Masuk (beli)';
+  if (j === 'keluar') return 'Keluar (pakai)';
+  if (j === 'jual') return 'Laku (jual)';
+  return j || '-';
+}
+
+function opnameLabel(j) {
+  if (j === 'tambah') return 'Tambah';
+  if (j === 'kurang') return 'Kurang';
+  return j || '-';
+}
+
+function stockStatusRank(b) {
+  const stok = parseFloat(b?.stok) || 0;
+  const min = parseFloat(b?.min) || 0;
+  if (stok <= 0) return 0;
+  if (min > 0 && stok <= min) return 1;
+  return 2;
+}
+
+function sortBahanForStok(list) {
+  const items = Array.isArray(list) ? [...list] : [];
+  if (stokSortMode === 'nama') {
+    return items.sort((a, b) => (a.nama || '').localeCompare(b.nama || '', 'id'));
+  }
+  if (stokSortMode === 'stok') {
+    return items.sort((a, b) => {
+      const sa = parseFloat(a.stok) || 0;
+      const sb = parseFloat(b.stok) || 0;
+      if (sa !== sb) return sa - sb;
+      const ra = stockStatusRank(a);
+      const rb = stockStatusRank(b);
+      if (ra !== rb) return ra - rb;
+      return (a.nama || '').localeCompare(b.nama || '', 'id');
+    });
+  }
+  return items.sort((a, b) => {
+    const ra = stockStatusRank(a);
+    const rb = stockStatusRank(b);
+    if (ra !== rb) return ra - rb;
+    const sa = parseFloat(a.stok) || 0;
+    const sb = parseFloat(b.stok) || 0;
+    if (sa !== sb) return sa - sb;
+    return (a.nama || '').localeCompare(b.nama || '', 'id');
+  });
+}
+
+function setStokSort(mode) {
+  stokSortMode = mode === 'stok' ? 'stok' : mode === 'nama' ? 'nama' : 'status';
+  render();
+}
+
+function convertPricePerUnit(price, fromUnit, toUnit) {
+  const oldUnit = normalizeUnit(fromUnit);
+  const newUnit = normalizeUnit(toUnit);
+  if (!oldUnit || !newUnit || oldUnit === newUnit) return Math.round(parseFloat(price) || 0);
+  const famA = unitFamily(oldUnit);
+  const famB = unitFamily(newUnit);
+  if (!famA || famA !== famB) return Math.round(parseFloat(price) || 0);
+  const fromFactor = UNIT_TO_BASE[oldUnit] || 1;
+  const toFactor = UNIT_TO_BASE[newUnit] || 1;
+  return Math.round((parseFloat(price) || 0) * (toFactor / fromFactor));
+}
+
+function openBahanModal(b = null) {
+  const modal = document.getElementById('modal-bahan');
+  const title = document.getElementById('bahan-modal-title');
+  const saveBtn = document.getElementById('bahan-save-btn');
+  const idEl = document.getElementById('bid');
+  if (!modal || !title || !saveBtn || !idEl) return;
+
+  bahanEditId = b?.id || '';
+  idEl.value = bahanEditId;
+  document.getElementById('bk').value = b?.kode || '';
+  document.getElementById('bn').value = b?.nama || '';
+  document.getElementById('bs').value = b?.satuan || 'kg';
+  document.getElementById('bh').value = b?.harga ?? '';
+  document.getElementById('bst').value = b?.stok ?? '';
+  document.getElementById('bm').value = b?.min ?? '';
+
+  title.textContent = bahanEditId ? 'Stok Opname' : 'Tambah Bahan Baku';
+  saveBtn.textContent = bahanEditId ? 'Simpan Opname' : 'Simpan';
+  om('modal-bahan');
+}
+
+function closeBahanModal() {
+  bahanEditId = '';
+  document.getElementById('bid').value = '';
+  ['bk', 'bn', 'bh', 'bst', 'bm'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('bs').value = 'kg';
+  document.getElementById('bahan-modal-title').textContent = 'Tambah Bahan Baku';
+  document.getElementById('bahan-save-btn').textContent = 'Simpan';
+  cm('modal-bahan');
+}
+
+function closeBahanMenus(exceptId = '') {
+  document.querySelectorAll('.opt-menu.on').forEach(el => {
+    if (!exceptId || el.id !== `opt-${exceptId}`) el.classList.remove('on');
+  });
+}
+
+function toggleBahanMenu(id, evt) {
+  if (evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+  }
+  const menu = document.getElementById(`opt-${id}`);
+  if (!menu) return;
+  const willOpen = !menu.classList.contains('on');
+  closeBahanMenus(id);
+  menu.classList.toggle('on', willOpen);
+}
+
+function viewBahan(id) {
+  const b = db.bahan.find(x => x.id === id);
+  if (!b) { alert('Bahan tidak ditemukan'); return; }
+  closeBahanMenus();
+  const nameEl = document.getElementById('bahan-view-name');
+  const bodyEl = document.getElementById('bahan-view-body');
+  if (nameEl) nameEl.textContent = b.nama || '-';
+  if (bodyEl) {
+    const status = parseFloat(b.stok) <= 0 ? 'Habis' : (parseFloat(b.min) > 0 && parseFloat(b.stok) <= parseFloat(b.min) ? 'Hampir habis' : 'Aman');
+    bodyEl.innerHTML = [
+      `<div><strong>Kode:</strong> ${bahanKode(b)}</div>`,
+      `<div><strong>Nama:</strong> ${b.nama || '-'}</div>`,
+      `<div><strong>Satuan:</strong> ${b.satuan || '-'}</div>`,
+      `<div><strong>Harga/Satuan:</strong> ${rp(b.harga)}</div>`,
+      `<div><strong>Stok:</strong> ${displayQty(b.stok, b.satuan)}</div>`,
+      `<div><strong>Min. Stok:</strong> ${b.min || '-'}</div>`,
+      `<div><strong>Status:</strong> ${status}</div>`
+    ].join('');
+  }
+  om('modal-bahan-view');
+}
+
+function recordStockOpname(bahan, beforeQty, afterQty, beforeUnit, afterUnit, note, extra = {}) {
+  if (!bahan) return;
+  const beforeNum = parseFloat(beforeQty) || 0;
+  const afterNum = parseFloat(afterQty) || 0;
+  const delta = Math.round((afterNum - beforeNum) * 1000) / 1000;
+  if (!delta) return;
+
+  db.opname = Array.isArray(db.opname) ? db.opname : [];
+  db.opname.unshift({
+    id: 'o' + Date.now() + Math.random().toString(36).slice(2, 6),
+    w: new Date().toLocaleString('id-ID'),
+    ts: Date.now(),
+    bahanId: bahan.id,
+    b: bahan.nama || '-',
+    kode: bahanKode(bahan),
+    satuan: afterUnit || beforeUnit || bahan.satuan || '',
+    j: delta > 0 ? 'tambah' : 'kurang',
+    delta: Math.abs(delta),
+    stok_awal: beforeNum,
+    stok_akhir: afterNum,
+    n: note || 'Stok opname',
+    ...extra
+  });
+}
+
+let pendingOpname = null;
+
+function restoreBahanSnapshot(target, snapshot) {
+  if (!target || !snapshot) return;
+  Object.keys(target).forEach(k => { delete target[k]; });
+  Object.assign(target, JSON.parse(JSON.stringify(snapshot)));
+}
+
+function openOpnameReasonModal(payload) {
+  pendingOpname = payload;
+  const info = document.getElementById('opname-info');
+  const delta = document.getElementById('opname-delta');
+  const area = document.getElementById('opname-reason');
+  if (info) {
+    info.innerHTML = `<div><strong>Bahan:</strong> ${payload.bahan?.nama || '-'}</div><div><strong>Stok awal:</strong> ${displayQty(payload.beforeQty, payload.unit)}</div><div><strong>Stok akhir:</strong> ${displayQty(payload.afterQty, payload.unit)}</div>`;
+  }
+  if (delta) {
+    const label = payload.delta > 0 ? 'Kelebihan stok' : 'Kekurangan stok';
+    delta.textContent = `${label}: ${payload.delta > 0 ? '+' : '-'}${displayQty(Math.abs(payload.delta), payload.unit)}`;
+  }
+  if (area) area.value = '';
+  om('modal-opname-reason');
+}
+
+function cancelOpnameReason() {
+  if (pendingOpname?.target && pendingOpname?.beforeSnapshot) {
+    restoreBahanSnapshot(pendingOpname.target, pendingOpname.beforeSnapshot);
+    saveDB();
+  }
+  pendingOpname = null;
+  cm('modal-opname-reason');
+  render();
+}
+
+function saveOpnameReason() {
+  if (!pendingOpname) return;
+  const note = document.getElementById('opname-reason')?.value.trim() || '';
+  if (!note) { alert('Alasan wajib diisi'); return; }
+  recordStockOpname(pendingOpname.target, pendingOpname.beforeQty, pendingOpname.afterQty, pendingOpname.unit, pendingOpname.unit, note);
+  saveDB();
+  pendingOpname = null;
+  cm('modal-opname-reason');
+  render();
+}
+
+function opnameBahan(id) {
+  const b = db.bahan.find(x => x.id === id);
+  if (!b) { alert('Bahan tidak ditemukan'); return; }
+  closeBahanMenus();
+  openBahanModal(b);
+}
+
+function editBahan(id) {
+  opnameBahan(id);
+}
+
+function updateBahanWithUnitChange(target, source) {
+  const oldUnit = target.satuan;
+  const newUnit = source.satuan;
+  const sameFamily = unitFamily(oldUnit) && unitFamily(oldUnit) === unitFamily(newUnit);
+  target.kode = source.kode;
+  target.nama = source.nama;
+  target.satuan = source.satuan;
+  target.harga = sameFamily ? convertPricePerUnit(source.harga, oldUnit, newUnit) : Math.round(parseFloat(source.harga) || 0);
+  target.stok = sameFamily ? Math.round((convertUnitQty(source.stok, oldUnit, newUnit) || 0) * 1000) / 1000 : Math.round((parseFloat(source.stok) || 0) * 1000) / 1000;
+  target.min = sameFamily ? Math.round((convertUnitQty(source.min, oldUnit, newUnit) || 0) * 1000) / 1000 : Math.round((parseFloat(source.min) || 0) * 1000) / 1000;
+}
+
+function updateStokUnit() {
+  const sel = document.getElementById('tb');
+  const el = document.getElementById('tq-unit');
+  if (!el) return;
+  const bid = sel ? sel.value : '';
+  const b = db.bahan.find(x => x.id === bid);
+  if (!b) {
+    el.textContent = '(Satuan: -)';
+    return;
+  }
+  const lower = bahanLowerUnit(b.satuan);
+  el.textContent = `(Satuan: ${lower || b.satuan})`;
+}
+
+function syncJualFormUI() {
+  const card = document.getElementById('jual-card');
+  const btn = document.getElementById('jual-toggle');
+  if (card) card.classList.toggle('collapsed', jualFormCollapsed);
+  if (btn) btn.textContent = jualFormCollapsed ? 'Tampilkan' : 'Sembunyikan';
+}
+
+function toggleJualForm() {
+  jualFormCollapsed = !jualFormCollapsed;
+  syncJualFormUI();
+}
+
+// ─── RENDER ───────────────────────────────────────────────
+function render() {
+  const hab = db.bahan.filter(b => (parseFloat(b.stok) || 0) <= 0).length;
+  const hmp = db.bahan.filter(b => (parseFloat(b.stok) || 0) > 0 && (parseFloat(b.min) || 0) > 0 && (parseFloat(b.stok) || 0) <= (parseFloat(b.min) || 0)).length;
+
+  document.getElementById('mets').innerHTML = `
+    <div class="met"><div class="met-l">Total Bahan</div><div class="met-v">${db.bahan.length}</div></div>
+    <div class="met"><div class="met-l">Total Resep</div><div class="met-v">${db.resep.length}</div></div>
+    <div class="met"><div class="met-l">Hampir Habis</div><div class="met-v w">${hmp}</div></div>
+    <div class="met"><div class="met-l">Stok Habis</div><div class="met-v d">${hab}</div></div>`;
+
+  const alertItems = db.bahan.filter(b => (parseFloat(b.min) || 0) > 0 && (parseFloat(b.stok) || 0) <= (parseFloat(b.min) || 0));
+
+  let al = '';
+  if (alertItems.length) {
+    al = `
+      <div class="alert-acc ${alertExpanded ? 'on' : ''}">
+        <button class="alert-head" onclick="toggleAlerts()">
+          <span>⚠️ Perlu restock <span class="alert-count">${alertItems.length} bahan</span></span>
+          <span class="alert-chev">${alertExpanded ? '▾' : '▸'}</span>
+        </button>
+        <div class="alert-body">
+          ${alertItems.map(b => `<div class="alert-item"><strong>${b.nama}</strong> — sisa ${b.stok} ${b.satuan} (min: ${b.min})</div>`).join('')}
+        </div>
+      </div>`;
+  }
+  document.getElementById('alrt').innerHTML = al;
+
+  const dr = db.bahan.map(b => `
+    <tr><td>${b.nama}</td><td>${b.stok}</td><td>${b.satuan}</td><td>${sbadge(parseFloat(b.stok)||0, parseFloat(b.min)||0)}</td></tr>
+  `).join('') || `<tr><td colspan="4" class="empty">Belum ada bahan</td></tr>`;
+  document.getElementById('dash-tb').innerHTML = dr;
+
+  const sel = document.getElementById('tb');
+  if (sel) {
+    sel.innerHTML = db.bahan.length
+      ? db.bahan.map(b => `<option value="${b.id}">${b.nama}</option>`).join('')
+      : '<option value="">Belum ada bahan</option>';
+    updateStokUnit();
+  }
+
+  const bahanSorted = sortBahanForStok(db.bahan);
+
+  const sr = bahanSorted.map(b => `
+    <tr>
+      <td>${b.nama}</td>
+      <td>${displayQty(b.stok, b.satuan)}</td>
+      <td>${b.min || '-'}</td>
+      <td>${sbadge(parseFloat(b.stok)||0, parseFloat(b.min)||0)}</td>
+      <td class="opt-cell">
+        <div class="opt-wrap">
+          <button class="opt-btn" type="button" onclick="toggleBahanMenu('${b.id}', event)" aria-label="Opsi bahan">⋮</button>
+          <div class="opt-menu" id="opt-${b.id}">
+            <button class="opt-item" type="button" onclick="opnameBahan('${b.id}')">Opname</button>
+            <button class="opt-item danger" type="button" onclick="delBahan('${b.id}')">Delete</button>
+            <button class="opt-item" type="button" onclick="viewBahan('${b.id}')">View</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="5" class="empty">Belum ada bahan</td></tr>`;
+  document.getElementById('stok-tb').innerHTML = sr;
+
+  let rh = '';
+  if (!db.resep.length) rh = '<div class="empty">Belum ada kartu resep.<br>Tap + untuk tambah.</div>';
+  db.resep.forEach(r => {
+    const hpp = r.bahan.reduce((s, rb) => {
+      const b = db.bahan.find(x => x.id === rb.id);
+      if (!b) return s;
+      const qtyInBahanUnit = convertUnitQty(rb.qty, rb.unit || b.satuan, b.satuan);
+      return s + qtyInBahanUnit * (parseFloat(b.harga) || 0);
+    }, 0);
+    const fc = r.hj > 0 ? Math.round(hpp / r.hj * 100) : '-';
+    const brows = r.bahan.map(rb => {
+      const b = db.bahan.find(x => x.id === rb.id);
+      if (!b) return '';
+      const qtyUnit = rb.unit || b.satuan;
+      const qtyInBahanUnit = convertUnitQty(rb.qty, qtyUnit, b.satuan);
+      return `<tr><td>${b.nama}</td><td>${displayQty(rb.qty, qtyUnit)}${qtyUnit !== b.satuan ? ` ≈ ${displayQty(qtyInBahanUnit, b.satuan)}` : ''}</td><td>${rp(qtyInBahanUnit * (parseFloat(b.harga) || 0))}</td></tr>`;
+    }).join('');
+    rh += `<div class="resep-card">
+      <div class="resep-head">
+        <div class="resep-head-main">
+          <div class="resep-name">${r.nama}</div>
+          <div class="resep-meta">Kode: <strong>${recipeKode(r)}</strong></div>
+        </div>
+        <div class="resep-actions">
+          <button class="btn sm edit" onclick="editResep('${r.id}')">Edit</button>
+          <button class="btn sm danger" onclick="delResep('${r.id}')">Hapus</button>
+        </div>
+      </div>
+      <div class="resep-metrics">
+        <div class="resep-met"><div class="resep-met-l">HPP</div><div class="resep-met-v" style="font-size:12px">${rp(hpp)}</div></div>
+        <div class="resep-met"><div class="resep-met-l">Jual</div><div class="resep-met-v" style="font-size:12px">${rp(r.hj)}</div></div>
+        <div class="resep-met"><div class="resep-met-l">Food Cost</div><div class="resep-met-v">${fc}%</div></div>
+      </div>
+      <table style="font-size:12px"><thead><tr><th>Bahan</th><th>Gramasi</th><th>Biaya</th></tr></thead><tbody>${brows}</tbody></table>
+    </div>`;
+  });
+  document.getElementById('rlist').innerHTML = rh;
+
+  const recipeIndexEl = document.getElementById('recipe-index');
+  if (recipeIndexEl) {
+    const items = [...db.resep].sort((a, b) => recipeKode(a).localeCompare(recipeKode(b), 'id'));
+    recipeIndexEl.innerHTML = items.length ? items.map(r => {
+      const nama = String(r.nama || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `
+      <div class="recipe-index-item">
+        <div>
+          <div class="recipe-index-code">${recipeKode(r)}</div>
+          <div class="recipe-index-name">${nama}</div>
+        </div>
+        <div class="recipe-index-actions">
+          <button class="btn sm" onclick="pickResep('${r.id}')">Pakai</button>
+          <button class="btn sm edit" onclick="editResep('${r.id}')">Edit</button>
+          <button class="btn sm danger" onclick="delResep('${r.id}')">Hapus</button>
+        </div>
+      </div>`;
+    }).join('') : '<div class="empty" style="padding:14px 0">Belum ada resep</div>';
+  }
+
+  const filteredTransaksi = filterByLogDate(db.transaksi);
+  const jualAllData = filteredTransaksi.filter(t => t.j === 'jual');
+  const stokRowsData = filteredTransaksi.filter(t => t.j === 'masuk' || t.j === 'keluar').slice(0, 50);
+  const jualRowsData = jualAllData.slice(0, 50);
+
+  const jualOmset = jualAllData.reduce((sum, t) => sum + (Number(t.total) || 0), 0);
+
+  const jualRows = jualRowsData.map(t => {
+    const menu = saleMenuTitle(t);
+    const kode = saleKodeValue(t);
+    const totalText = t.total ? rp(t.total) : '-';
+    return `
+    <tr>
+      <td style="font-size:11px;white-space:nowrap">${t.w}</td>
+      <td>${kode}</td>
+      <td>${menu}</td>
+      <td>${t.q} porsi</td>
+      <td>${totalText}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="5" class="empty">Belum ada rekap penjualan</td></tr>`;
+
+  const stokRows = stokRowsData.map(t => {
+    const qtyText = `${t.q} ${t.s}`;
+    const hasNote = t.n && String(t.n).trim();
+    return `
+    <tr>
+      <td style="font-size:11px;white-space:nowrap">${t.w}</td>
+      <td>${t.b}</td>
+      <td><span class="bx ${t.j === 'masuk' ? 'ok' : 'wn'}">${trxLabel(t.j)}</span></td>
+      <td>${qtyText}</td>
+      <td><button class="btn sm" onclick="showCatatan('${t.id}')">${hasNote ? 'Catatan' : '-'}</button></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="5" class="empty">Belum ada catatan stok</td></tr>`;
+
+  const opnameData = filterByLogDate(db.opname || []);
+  const opnamePlus = opnameData.filter(x => x.j === 'tambah').length;
+  const opnameMinus = opnameData.filter(x => x.j === 'kurang').length;
+  const opnameRows = opnameData.slice(0, 50).map(o => {
+    const selisih = `${o.j === 'tambah' ? '+' : '-'}${displayQty(o.delta, o.satuan || '')}`;
+    const before = displayQty(o.stok_awal, o.satuan || '');
+    const after = displayQty(o.stok_akhir, o.satuan || '');
+    const note = o.n && String(o.n).trim() ? o.n : '-';
+    return `
+    <tr>
+      <td style="font-size:11px;white-space:nowrap">${o.w}</td>
+      <td>${o.b || '-'}</td>
+      <td>${before}</td>
+      <td>${after}</td>
+      <td><span class="bx ${o.j === 'tambah' ? 'ok' : 'wn'}">${selisih}</span></td>
+      <td>${note}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6" class="empty">Belum ada riwayat stock opname</td></tr>`;
+
+  const jualOmsetEl = document.getElementById('jual-omset');
+  const jualCountEl = document.getElementById('jual-count');
+  if (jualOmsetEl) jualOmsetEl.textContent = rp(jualOmset);
+  if (jualCountEl) jualCountEl.textContent = jualAllData.length;
+
+  const opnameCountEl = document.getElementById('opname-count');
+  const opnamePlusEl = document.getElementById('opname-plus');
+  const opnameMinusEl = document.getElementById('opname-minus');
+  if (opnameCountEl) opnameCountEl.textContent = opnameData.length;
+  if (opnamePlusEl) opnamePlusEl.textContent = opnamePlus;
+  if (opnameMinusEl) opnameMinusEl.textContent = opnameMinus;
+
+  document.getElementById('jual-tb').innerHTML = jualRows;
+  document.getElementById('stoklog-tb').innerHTML = stokRows;
+  document.getElementById('opname-tb').innerHTML = opnameRows;
+
+  const financeSales = db.transaksi.filter(t => t.j === 'jual');
+  const financeOmset = financeSales.reduce((sum, t) => sum + (Number(t.total) || 0), 0);
+  const financeCount = financeSales.length;
+  const financeAvg = financeCount ? financeOmset / financeCount : 0;
+  const financeRecent = financeSales.slice(0, 10);
+
+  const financeMetricsEl = document.getElementById('finance-metrics');
+  if (financeMetricsEl) {
+    financeMetricsEl.innerHTML = `
+      <div class="log-stat">
+        <div class="log-stat-l">Omset</div>
+        <div class="log-stat-v accent">${rp(financeOmset)}</div>
+      </div>
+      <div class="log-stat">
+        <div class="log-stat-l">Transaksi</div>
+        <div class="log-stat-v">${financeCount}</div>
+      </div>
+      <div class="log-stat">
+        <div class="log-stat-l">Rata-rata</div>
+        <div class="log-stat-v">${rp(financeAvg)}</div>
+      </div>`;
+  }
+
+  const financeRows = financeRecent.map(t => {
+    const menu = saleMenuTitle(t);
+    const kode = saleKodeValue(t);
+    const totalText = t.total ? rp(t.total) : '-';
+    return `
+    <tr>
+      <td style="font-size:11px;white-space:nowrap">${t.w}</td>
+      <td>${kode}</td>
+      <td>${menu}</td>
+      <td>${t.q} porsi</td>
+      <td>${totalText}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="5" class="empty">Belum ada data finance</td></tr>`;
+  const financeTb = document.getElementById('finance-tb');
+  if (financeTb) financeTb.innerHTML = financeRows;
+
+  const tabJual = document.getElementById('tab-jual');
+  const tabStok = document.getElementById('tab-stoklog');
+  const tabOpname = document.getElementById('tab-stokopname');
+  const paneJual = document.getElementById('log-pane-jual');
+  const paneStok = document.getElementById('log-pane-stok');
+  const paneOpname = document.getElementById('log-pane-opname');
+  if (tabJual && tabStok && tabOpname && paneJual && paneStok && paneOpname) {
+    const showJual = logTab === 'jual';
+    const showStok = logTab === 'stok';
+    const showOpname = logTab === 'opname';
+    tabJual.classList.toggle('on', showJual);
+    tabStok.classList.toggle('on', showStok);
+    tabOpname.classList.toggle('on', showOpname);
+    paneJual.classList.toggle('on', showJual);
+    paneStok.classList.toggle('on', showStok);
+    paneOpname.classList.toggle('on', showOpname);
+  }
+  syncJualFormUI();
+  updateStokUnit();
+  closeBahanMenus();
+  refreshLogFilterUI();
+  refreshBackupUI();
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────
+function saveBahan() {
+  const kode = sanitizeBahanCode(document.getElementById('bk').value);
+  const nama = document.getElementById('bn').value.trim();
+  if (!kode) { alert('Kode bahan wajib'); return; }
+  if (!kode.startsWith('B-')) { alert('Kode bahan harus diawali B-'); return; }
+  if (!nama) { alert('Nama bahan wajib'); return; }
+
+  const satuan = document.getElementById('bs').value;
+  const harga = parseFloat(document.getElementById('bh').value) || 0;
+  const stok = parseFloat(document.getElementById('bst').value) || 0;
+  const min = parseFloat(document.getElementById('bm').value) || 0;
+
+  const dupeCode = db.bahan.find(b => b.id !== bahanEditId && sanitizeBahanCode(b.kode) === kode);
+  if (dupeCode) { alert('Kode bahan sudah dipakai'); return; }
+
+  const dupe = db.bahan.find(b => b.id !== bahanEditId && String(b.nama || '').trim().toLowerCase() === nama.toLowerCase());
+  if (dupe) { alert('Nama bahan sudah dipakai'); return; }
+
+  if (bahanEditId) {
+    const target = db.bahan.find(b => b.id === bahanEditId);
+    if (!target) { alert('Bahan tidak ditemukan'); return; }
+    const beforeSnapshot = JSON.parse(JSON.stringify(target));
+    const before = { ...target };
+    updateBahanWithUnitChange(target, { kode, nama, satuan, harga, stok, min });
+
+    const compareUnit = normalizeUnit(target.satuan);
+    const beforeUnit = normalizeUnit(before.satuan);
+    let beforeQty = parseFloat(before.stok) || 0;
+    if (compareUnit && beforeUnit && unitFamily(compareUnit) && unitFamily(compareUnit) === unitFamily(beforeUnit)) {
+      beforeQty = convertUnitQty(beforeQty, beforeUnit, compareUnit);
+    }
+    const afterQty = parseFloat(target.stok) || 0;
+    const delta = Math.round((afterQty - beforeQty) * 1000) / 1000;
+
+    saveDB();
+
+    if (delta !== 0) {
+      openOpnameReasonModal({
+        target,
+        beforeSnapshot,
+        bahan: target,
+        beforeQty,
+        afterQty,
+        unit: compareUnit || target.satuan || beforeUnit,
+        delta
+      });
+      render();
+      return;
+    }
+  } else {
+    const b = {
+      id: 'b' + Date.now(),
+      kode,
+      nama,
+      satuan,
+      harga,
+      stok,
+      min
+    };
+    db.bahan.push(b);
+  }
+
+  saveDB();
+  ss('ok', 'Tersimpan offline');
+
+  closeBahanModal();
+  render();
+}
+
+function delBahan(id) {
+  if (!confirm('Hapus bahan ini?')) return;
+  db.bahan = db.bahan.filter(b => b.id !== id);
+  saveDB();
+  render();
+}
+
+function saveTrx() {
+  const bulkRaw = document.getElementById('tbulk')?.value.trim() || '';
+
+  if (bulkRaw) {
+    const lines = bulkRaw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    if (lines.length < 2) { alert('Baris pertama harus masuk, lalu minimal 1 baris bahan'); return; }
+
+    const j = String(lines[0]).toLowerCase();
+    if (j !== 'masuk') {
+      alert('Mode input cepat hanya menerima masuk');
+      return;
+    }
+
+    const items = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      const parts = line.split(',').map(s => s.trim());
+      if (parts.length < 2) {
+        alert(`Baris ${i + 1} harus format KODE,JUMLAH,CATATAN`);
+        return;
+      }
+
+      const kode = sanitizeBahanCode(parts[0]);
+      const qty = parseFloat(parts[1]);
+      const note = parts.slice(2).join(',').trim();
+
+      if (!kode || !kode.startsWith('B-') || !Number.isFinite(qty) || qty <= 0) {
+        alert(`Baris ${i + 1} berisi kode bahan atau jumlah yang tidak valid`);
+        return;
+      }
+
+      const b = db.bahan.find(x => sanitizeBahanCode(x.kode) === kode);
+      if (!b) {
+        alert(`Baris ${i + 1}: kode bahan ${kode} tidak ditemukan`);
+        return;
+      }
+
+      const inputUnit = bahanLowerUnit(b.satuan);
+      const delta = convertUnitQty(qty, inputUnit || b.satuan, b.satuan);
+      items.push({ b, kode, qty, note, inputUnit, delta });
+    }
+
+    items.forEach(item => {
+      const prevStok = parseFloat(item.b.stok) || 0;
+      item.b.stok = Math.round(((j === 'masuk' ? prevStok + item.delta : Math.max(0, prevStok - item.delta)) * 1000)) / 1000;
+
+      const t = {
+        id: 't' + Date.now() + Math.random().toString(36).slice(2, 6),
+        w: new Date().toLocaleString('id-ID'),
+        ts: Date.now(),
+        b: `${item.b.nama} (${item.kode})`,
+        s: item.inputUnit || item.b.satuan,
+        j,
+        q: item.qty,
+        n: item.note
+      };
+      db.transaksi.unshift(t);
+    });
+
+    saveDB();
+    ss('ok', `Tersimpan offline (${items.length} baris)`);
+    document.getElementById('tbulk').value = '';
+    render();
+    return;
+  }
+
+  const bahanId = document.getElementById('tb')?.value || '';
+  const jenis = document.getElementById('tj')?.value || 'masuk';
+  const qty = parseFloat(document.getElementById('tq')?.value || '');
+  const note = (document.getElementById('tn')?.value || '').trim();
+  const b = db.bahan.find(x => x.id === bahanId);
+
+  if (!b) { alert('Pilih bahan'); return; }
+  if (jenis !== 'masuk') { alert('Mode form hanya menerima masuk'); return; }
+  if (!Number.isFinite(qty) || qty <= 0) { alert('Jumlah harus lebih dari 0'); return; }
+
+  const inputUnit = bahanLowerUnit(b.satuan) || b.satuan;
+  const delta = convertUnitQty(qty, inputUnit, b.satuan);
+  const prevStok = parseFloat(b.stok) || 0;
+  b.stok = Math.round(((jenis === 'masuk' ? prevStok + delta : Math.max(0, prevStok - delta)) * 1000)) / 1000;
+
+  db.transaksi.unshift({
+    id: 't' + Date.now() + Math.random().toString(36).slice(2, 6),
+    w: new Date().toLocaleString('id-ID'),
+    ts: Date.now(),
+    b: `${b.nama} (${bahanKode(b)})`,
+    s: inputUnit,
+    j: jenis,
+    q: qty,
+    n: note
+  });
+
+  saveDB();
+  ss('ok', 'Tersimpan offline');
+  const tq = document.getElementById('tq');
+  const tn = document.getElementById('tn');
+  if (tq) tq.value = '';
+  if (tn) tn.value = '';
+  render();
+}
+
+function saveJual() {
+  const raw = document.getElementById('pj').value.trim();
+  const saleDateValue = document.getElementById('pj-date')?.value || toInputDate(new Date());
+  if (!raw) { alert('Isi format penjualan'); return; }
+
+  const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (!lines.length) { alert('Isi format penjualan'); return; }
+
+  const items = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const parts = line.split(',').map(s => s.trim());
+    if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) {
+      alert(`Baris ${i + 1} harus format KODE,JUMLAH,TOTAL`);
+      return;
+    }
+
+    const kode = safeKode(parts[0]);
+    const qty = parseFloat(parts[1]);
+    const totalRibu = parseFloat(parts[2]);
+
+    if (!kode || !isFinite(qty) || qty <= 0 || !isFinite(totalRibu) || totalRibu <= 0) {
+      alert(`Baris ${i + 1} berisi kode, jumlah, atau total yang tidak valid`);
+      return;
+    }
+
+    const resep = db.resep.find(r => recipeKode(r) === kode);
+    if (!resep) {
+      alert(`Baris ${i + 1}: kode resep ${kode} tidak ditemukan`);
+      return;
+    }
+
+    const saleTs = new Date(`${saleDateValue}T12:00:00`).getTime();
+    items.push({ kode, qty, totalRibu, resep, line, ts: saleTs + i });
+  }
+
+  items.forEach(item => {
+    item.resep.bahan.forEach(rb => {
+      const b = db.bahan.find(x => x.id === rb.id);
+      if (!b) return;
+      const prevStok = parseFloat(b.stok) || 0;
+      const used = convertUnitQty(rb.qty, rb.unit || b.satuan, b.satuan) * item.qty;
+      b.stok = Math.round(Math.max(0, prevStok - used) * 1000) / 1000;
+    });
+
+    const t = {
+      id: 't' + Date.now() + Math.random().toString(36).slice(2, 6),
+      w: new Date(item.ts).toLocaleString('id-ID'),
+      ts: item.ts,
+      b: `${item.resep.nama} (${item.kode})`,
+      s: 'porsi',
+      j: 'jual',
+      q: item.qty,
+      total: Math.round(item.totalRibu * 1000),
+      kode: item.kode,
+      n: item.line
+    };
+    db.transaksi.unshift(t);
+  });
+
+  saveDB();
+  ss('ok', `Rekap penjualan tersimpan (${items.length} transaksi)`);
+
+  document.getElementById('pj').value = '';
+  render();
+}
+
+
+function saveOwnerUsage() {
+  const raw = document.getElementById('owner').value.trim();
+  const dateValue = document.getElementById('owner-date')?.value || toInputDate(new Date());
+  if (!raw) { alert('Isi format penggunaan owner'); return; }
+
+  const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (!lines.length) { alert('Isi format penggunaan owner'); return; }
+
+  const items = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const parts = line.split(',').map(s => s.trim());
+    if (parts.length < 2 || !parts[0] || !parts[1]) {
+      alert(`Baris ${i + 1} harus format KODE,JUMLAH`);
+      return;
+    }
+
+    const kode = safeKode(parts[0]);
+    const qty = parseFloat(parts[1]);
+    if (!kode || !isFinite(qty) || qty <= 0) {
+      alert(`Baris ${i + 1} berisi kode atau jumlah yang tidak valid`);
+      return;
+    }
+
+    const resep = db.resep.find(r => recipeKode(r) === kode);
+    if (!resep) {
+      alert(`Baris ${i + 1}: kode resep ${kode} tidak ditemukan`);
+      return;
+    }
+
+    const ts = new Date(`${dateValue}T12:00:00`).getTime();
+    items.push({ kode, qty, resep, line, ts: ts + i });
+  }
+
+  items.forEach(item => {
+    item.resep.bahan.forEach(rb => {
+      const b = db.bahan.find(x => x.id === rb.id);
+      if (!b) return;
+      const prevStok = parseFloat(b.stok) || 0;
+      const used = convertUnitQty(rb.qty, rb.unit || b.satuan, b.satuan) * item.qty;
+      const afterStok = Math.round(Math.max(0, prevStok - used) * 1000) / 1000;
+      b.stok = afterStok;
+
+      recordStockOpname(
+        b,
+        prevStok,
+        afterStok,
+        b.satuan,
+        b.satuan,
+        `Owner: ${item.resep.nama} x${item.qty}`,
+        {
+          src: 'owner',
+          menu: item.resep.nama,
+          menuKode: item.kode,
+          qtyMenu: item.qty
+        }
+      );
+    });
+  });
+
+  saveDB();
+  ss('ok', `Rekap penggunaan owner tersimpan (${items.length} transaksi)`);
+
+  document.getElementById('owner').value = '';
+  render();
+}
+
+function openResepModal(r = null) {
+  recipeEditId = r?.id || '';
+  document.getElementById('rk').value = r?.kode || '';
+  document.getElementById('rn').value = r?.nama || '';
+  document.getElementById('rj').value = r?.hj ?? '';
+  document.getElementById('rblist').innerHTML = '';
+  (r?.bahan || []).forEach(rb => {
+    addRB();
+    const rows = document.querySelectorAll('#rblist .rb');
+    const row = rows[rows.length - 1];
+    if (!row) return;
+    const select = row.querySelector('select');
+    if (select) {
+      select.value = rb.id;
+      updateRBRow(select);
+    }
+    const qtyInput = row.querySelector('input[type="number"]');
+    if (qtyInput) qtyInput.value = rb.qty ?? '';
+    const unitSelect = row.querySelector('.rb-unit-select');
+    if (unitSelect && rb.unit) {
+      unitSelect.value = normalizeUnit(rb.unit);
+      syncRBUnitLabel(unitSelect);
+    }
+  });
+  document.getElementById('resep-modal-title').textContent = recipeEditId ? 'Edit Kartu Resep' : 'Tambah Kartu Resep';
+  document.getElementById('resep-save-btn').textContent = recipeEditId ? 'Simpan Perubahan' : 'Simpan Resep';
+  prevHPP();
+  om('modal-resep');
+}
+
+function closeResepModal() {
+  recipeEditId = '';
+  document.getElementById('rk').value = '';
+  document.getElementById('rn').value = '';
+  document.getElementById('rj').value = '';
+  document.getElementById('rblist').innerHTML = '';
+  document.getElementById('resep-modal-title').textContent = 'Tambah Kartu Resep';
+  document.getElementById('resep-save-btn').textContent = 'Simpan Resep';
+  cm('modal-resep');
+}
+
+function editResep(id) {
+  const r = db.resep.find(x => x.id === id);
+  if (!r) { alert('Resep tidak ditemukan'); return; }
+  openResepModal(r);
+}
+
+function saveResep() {
+  const kode = safeKode(document.getElementById('rk').value);
+  const nama = document.getElementById('rn').value.trim();
+  if (!kode) { alert('Kode resep wajib'); return; }
+  if (!nama) { alert('Nama menu wajib'); return; }
+
+  const kodeList = db.resep.filter(r => r.id !== recipeEditId).map(r => recipeKode(r));
+  if (kodeList.includes(kode)) { alert('Kode resep sudah dipakai'); return; }
+
+  const bahan = [];
+  document.querySelectorAll('#rblist .rb').forEach(r => {
+    const s = r.querySelector('select');
+    const q = parseFloat(r.querySelector('input').value) || 0;
+    const u = normalizeUnit(r.querySelector('.rb-unit-select')?.value || '');
+    if (s.value && q > 0) bahan.push({ id: s.value, qty: q, unit: u });
+  });
+
+  const target = recipeEditId ? db.resep.find(r => r.id === recipeEditId) : null;
+  if (target) {
+    target.kode = kode;
+    target.nama = nama;
+    target.hj = parseFloat(document.getElementById('rj').value) || 0;
+    target.bahan = bahan;
+  } else {
+    db.resep.push({
+      id: 'r' + Date.now(),
+      kode,
+      nama,
+      hj: parseFloat(document.getElementById('rj').value) || 0,
+      bahan
+    });
+  }
+
+  saveDB();
+  ss('ok', recipeEditId ? 'Perubahan resep disimpan' : 'Tersimpan offline');
+
+  closeResepModal();
+  render();
+}
+
+function delResep(id) {
+  if (!confirm('Hapus resep ini?')) return;
+  db.resep = db.resep.filter(r => r.id !== id);
+  if (recipeEditId === id) closeResepModal();
+  saveDB();
+  render();
+}
+
+function pickResep(id) {
+  const r = db.resep.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('rk').value = recipeKode(r);
+  document.getElementById('rn').value = r.nama || '';
+  document.getElementById('rj').value = r.hj || 0;
+  render();
+}
+
+// ─── RESEP ROWS ───────────────────────────────────────────
+function addRB() {
+  const box = document.getElementById('rblist');
+  if (!db.bahan.length) {
+    alert('Tambahkan bahan baku dulu');
+    return;
+  }
+  const d = document.createElement('div');
+  d.className = 'rb';
+  const opts = db.bahan.map(b => `<option value="${b.id}" data-h="${b.harga}" data-s="${b.satuan}">${b.nama}</option>`).join('');
+  d.innerHTML = `
+    <select class="form-input" onchange="updateRBRow(this);prevHPP()">${opts}</select>
+    <div>
+      <div class="rb-unit">Otomatis: -</div>
+      <div class="rb-unit-row">
+        <input type="number" class="form-input" placeholder="Qty" min="0" step="0.1" oninput="prevHPP()">
+        <select class="form-input rb-unit-select" onchange="syncRBUnitLabel(this);prevHPP()"></select>
+      </div>
+    </div>
+    <button class="btn" onclick="this.parentElement.remove();prevHPP()">✕</button>`;
+  box.appendChild(d);
+  updateRBRow(d.querySelector('select'));
+  prevHPP();
+}
+
+function syncRBUnitLabel(unitSelectEl) {
+  const row = unitSelectEl?.closest('.rb');
+  if (!row) return;
+  const unitEl = row.querySelector('.rb-unit');
+  const unit = unitShort(unitSelectEl?.value);
+  if (unitEl) unitEl.textContent = `Otomatis: ${unit}`;
+}
+
+function updateRBRow(selectEl) {
+  const row = selectEl?.closest('.rb');
+  if (!row) return;
+  const bahan = db.bahan.find(x => x.id === selectEl.value);
+  const bahanUnit = normalizeUnit(bahan?.satuan);
+  const unitSelect = row.querySelector('.rb-unit-select');
+  if (!unitSelect) return;
+  const options = unitOptionsFor(bahanUnit);
+  unitSelect.innerHTML = options.map(u => `<option value="${u}">${u}</option>`).join('');
+  unitSelect.value = options.includes(bahanUnit) ? bahanUnit : (options[0] || '');
+  syncRBUnitLabel(unitSelect);
+}
+
+function prevHPP() {
+  let hpp = 0;
+  document.querySelectorAll('#rblist .rb').forEach(r => {
+    const bahanSelect = r.querySelector('select');
+    const qtyInput = r.querySelector('input');
+    const unitSelect = r.querySelector('.rb-unit-select');
+    const bahan = db.bahan.find(x => x.id === bahanSelect?.value);
+    if (!bahan) return;
+    const qty = parseFloat(qtyInput?.value) || 0;
+    const qtyInBahanUnit = convertUnitQty(qty, unitSelect?.value || bahan.satuan, bahan.satuan);
+    hpp += qtyInBahanUnit * (parseFloat(bahan.harga) || 0);
+  });
+  const hj = parseFloat(document.getElementById('rj').value) || 0;
+  const el = document.getElementById('hpre');
+  if (hpp > 0) {
+    el.style.display = 'block';
+    el.textContent = `HPP: ${rp(hpp)}${hj > 0 ? ' | Food Cost: ' + Math.round(hpp / hj * 100) + '%' : ''}`;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function toggleAlerts() {
+  alertExpanded = !alertExpanded;
+  render();
+}
+
+function setLogTab(tab) {
+  logTab = tab === 'stok' ? 'stok' : tab === 'opname' ? 'opname' : 'jual';
+  render();
+}
+
+function getSaleRecipeImpact(t) {
+  const kode = saleKodeValue(t);
+  const resep = db.resep.find(r => recipeKode(r) === kode);
+  if (!resep) return [];
+  const qtyMenu = parseFloat(t?.q) || 0;
+  return resep.bahan.map(rb => {
+    const b = db.bahan.find(x => x.id === rb.id);
+    if (!b) return null;
+    const usedInBahanUnit = convertUnitQty(rb.qty, rb.unit || b.satuan, b.satuan) * qtyMenu;
+    return {
+      b,
+      used: Math.round(usedInBahanUnit * 1000) / 1000
+    };
+  }).filter(Boolean);
+}
+
+function restoreSaleStock(t) {
+  getSaleRecipeImpact(t).forEach(item => {
+    const prevStok = parseFloat(item.b.stok) || 0;
+    item.b.stok = Math.round((prevStok + item.used) * 1000) / 1000;
+  });
+}
+
+function showCatatan(id) {
+  const t = db.transaksi.find(x => x.id === id);
+  const meta = document.getElementById('catatan-meta');
+  const text = document.getElementById('catatan-text');
+  if (!t) {
+    meta.textContent = 'Transaksi tidak ditemukan';
+    text.textContent = '';
+  } else {
+    const qtyText = t.j === 'jual'
+      ? `${t.q} porsi${t.total ? ' · ' + rp(t.total) : ''}`
+      : `${t.q} ${t.s}`;
+    const jenisGroup = t.j === 'jual' ? 'Rekap Penjualan' : 'Catatan Stok';
+    meta.textContent = `${jenisGroup} · ${t.w} · ${t.b} · ${trxLabel(t.j)} ${qtyText}`;
+    text.textContent = t.n && String(t.n).trim() ? t.n : 'Tidak ada catatan.';
+  }
+  om('modal-catatan');
+}
+
+// ─── NAV ──────────────────────────────────────────────────
+function goTab(t, el) {
+  currentTab = t;
+  document.querySelectorAll('.nav-btn').forEach(e => e.classList.remove('on'));
+  document.querySelectorAll('.section').forEach(e => e.classList.remove('on'));
+  if (el && el.classList) el.classList.add('on');
+  const sec = document.getElementById('sec-' + t);
+  if (sec) sec.classList.add('on');
+  document.getElementById('fab').style.display = (t === 'stok' || t === 'resep') ? 'flex' : 'none';
+}
+
+function toggleMenu() {
+  const el = document.getElementById('menu-overlay');
+  if (!el) return;
+  el.classList.toggle('on');
+  syncScrollLock();
+}
+
+function openMenuTab(tab) {
+  cm('menu-overlay');
+  goTab(tab);
+}
+
+function onFab() {
+  if (currentTab === 'stok') openBahanModal();
+  else if (currentTab === 'resep') {
+    if (!document.getElementById('rblist').children.length) addRB();
+    om('modal-resep');
+  }
+}
+
+// ─── GLOBAL CLICK OUTSIDE MODALS ──────────────────────────
+document.querySelectorAll('.overlay').forEach(el => {
+  el.addEventListener('click', e => {
+    if (e.target === el) {
+      if (el.id === 'modal-bahan') closeBahanModal();
+      else if (el.id === 'modal-opname-reason') cancelOpnameReason();
+      else {
+        el.classList.remove('on');
+        syncScrollLock();
+      }
+    }
+  });
+});
+
+document.addEventListener('click', () => closeBahanMenus());
+
+window.addEventListener('resize', syncScrollLock);
+window.addEventListener('beforeunload', () => {
+  try {
+    if (backupReady) addBackupSnapshot('auto');
+  } catch (e) {}
+});
+
+// default
+document.getElementById('fab').style.display = 'none';
+syncScrollLock();
+</script>
+
+</body>
+</html>
